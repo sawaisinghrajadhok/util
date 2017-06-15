@@ -4,29 +4,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 public class Test {
-	static List<Availability> availabilities = new ArrayList<Availability>();
-	static {
-		try {
-			TimePeriod t4 = new TimePeriod();
-			t4.setStartTime("17:07");
-			t4.setEndTime("17:07");
-
-			Availability a4 = new Availability();
-			a4.setName(Day.FRI);
-			a4.setTimePeriods(t4);
-			calculateNextTime(Day.FRI, a4.getTimePeriods().getStartTime());
-
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-	}
-
-	public static void calculateNextTime(Day day, String startTime) throws ParseException {
+	public static Date calculateNextTime(Day day, String startTime) throws ParseException {
 		SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		Date d = new Date();
 		Calendar calendar = new GregorianCalendar();
@@ -44,14 +28,38 @@ public class Test {
 		} else {
 			total = day.toValue() - calendar.get(Calendar.DAY_OF_WEEK);
 		}
-		
 		calendar.add(Calendar.DAY_OF_MONTH, total);
-		Date nextRunTime = parser.parse(calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-"+ calendar.get(Calendar.DAY_OF_MONTH) + " " + startTime);
-		System.out.println(nextRunTime);
+		return parser.parse(calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-"+ calendar.get(Calendar.DAY_OF_MONTH) + " " + startTime);
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ParseException {
+		TimePeriod t4 = new TimePeriod();
+		t4.setStartTime("17:07");
+		t4.setEndTime("17:07");
 
+		Availability a4 = new Availability();
+		a4.setName(Day.FRI);
+		a4.setTimePeriods(t4);
+		
+		List<Date> dates = new ArrayList<Date>();
+		dates.add(calculateNextTime(Day.MON, t4.getStartTime()));
+		dates.add(calculateNextTime(Day.TUE, t4.getStartTime()));
+		dates.add(calculateNextTime(Day.FRI, t4.getStartTime()));
+		dates.add(calculateNextTime(Day.SAT, t4.getStartTime()));
+		dates.add(calculateNextTime(Day.TUE, t4.getStartTime()));
+		dates.add(calculateNextTime(Day.WED, t4.getStartTime()));
+		
+		dates.sort(new Comparator<Date>() {
+			@Override
+			public int compare(Date o1, Date o2) {
+				System.out.println("--");
+				return o1.before(o2)? o1.hashCode(): 1;
+			}
+		});
+		
+		for (Date d : dates){
+			System.out.println(d);
+		}
 	}
 }
 
