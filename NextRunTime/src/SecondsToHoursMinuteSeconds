@@ -1,0 +1,15 @@
+private static void parse(int timeInSeconds) {
+		int sec = 0;
+		int min = 0;
+		int hrs = 0;
+		
+		if (time > 60 ) {
+			min = time / 60;
+			if (min >= 60) {
+				hrs = min / 60;
+				min = min - (hrs * 60);
+			}
+		}
+		sec = time % 60;
+		System.out.println(hrs + " : " + min + " : " + sec);
+	}
